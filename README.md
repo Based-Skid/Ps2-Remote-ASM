@@ -1,5 +1,5 @@
 # PS2-Remote-ASM
-Created By: Based_Skid, Harry62 and 1up
+Created By: Based_Skid, 1UP, Harry62, And The_Dominator
 Copyright 2018
 
 Special Thanks to: PS2DEV,SP193,Gtlcpimp32
