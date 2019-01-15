@@ -2,15 +2,56 @@
 #include "main.h" 
 // App Strings
 #include "strings.h"
+// MD5 Shit
+#include "md5.h"
+
+extern void loader_elf; // wLaunchELF's loader.elf.
+
+typedef struct {
+	u8	ident[16];
+	u16	type;
+	u16	machine;
+	u32	version;
+	u32	entry;
+	u32	phoff;
+	u32	shoff;
+	u32	flags;
+	u16	ehsize;
+	u16	phentsize;
+	u16	phnum;
+	u16	shentsize;
+	u16	shnum;
+	u16	shstrndx;
+} elf_header_t;
+
+typedef struct {
+	u32	type;
+	u32	offset;
+	void	*vaddr;
+	u32	paddr;
+	u32	filesz;
+	u32	memsz;
+	u32	flags;
+	u32	align;
+} elf_pheader_t;
+
+void menu_header(void)
+{
+	scr_printf(appName);
+	scr_printf(appVer);
+	scr_printf(appAuthor);
+	//scr_printf(appNotice);
+}
 
 void menu_Text(void)
 {
 	scr_clear();
 	scr_printf(appName);
 	scr_printf(appVer);
-	printf(appAuthor);
-	printf(appNotice);
+	scr_printf(appAuthor);
+	scr_printf(appNotice);
 	scr_printf(txtcrossBtn);
+	scr_printf(txtselBtn);
 	//scr_printf(txtsqrBtn);
 	scr_printf(" \n");
 }
@@ -21,8 +62,11 @@ void initialize(void)
 	int ret;
 
 	SifInitRpc(0);
+	scr_clear();
 	// init debug screen
 	init_scr();
+	scr_clear();
+	menu_header();
 	scr_printf("Loading... Please Wait. \n");
 	// load all modules
 	LoadModules();
@@ -48,24 +92,6 @@ void initialize(void)
 	}
 }
 
-int LoadIRX()
-{
-	int a;
-	printf(" Loading IRX!\n");
-
-	a = SifExecModuleBuffer(&poweroff, size_poweroff, 0, NULL, NULL);
-	if (a < 0 )
-	{
-    scr_printf(" Could not load POWEROFF.IRX! %d\n", a);
-	return -1;
-	}
-
-	printf(" Loaded POWEROFF.IRX!\n");
-	return 0;
-	
-
-
-}
 
 void LoadModules(void)
 {
@@ -174,6 +200,13 @@ void LoadModules(void)
 	{
         scr_printf("	Could not load ps2http.IRX! %d\n", ret);
 	return -1;
+	}
+	
+	ret = SifExecModuleBuffer(&poweroff, size_poweroff, 0, NULL, NULL);
+	if (ret < 0) 
+	{
+		printf("Failed to Load Poweroff IRX module");
+
 	}
  
 	}
@@ -366,7 +399,7 @@ void gotoOSDSYS(int sc)
 		}
 		if (sc == 6)
 		{
-			scr_printf("ERROR: Unknown\n");
+			scr_printf("Failed to Load Remote ELF.\n");
 		}
 		sleep(5);
 	}
@@ -374,6 +407,7 @@ void gotoOSDSYS(int sc)
 	scr_printf(osdmsg);
 	LoadExecPS2("rom0:OSDSYS", 0, NULL);
 }
+
 
 
 void loadGame()
@@ -424,7 +458,6 @@ int apply_Update(unsigned int *buffer[])
     DI();
     ee_kmode_enter();
 
-
     // address variable
     unsigned int *address = 0;    
     // data variable
@@ -469,6 +502,84 @@ int apply_Update(unsigned int *buffer[])
     EI();
 }
 
+void BootELF(int lapp)
+{
+	u8 *pdata, *dest;
+	elf_header_t *eh;
+	elf_pheader_t *eph;
+	int i, j, ret;
+	char arg0[256], arg1[256], arg2[256], arg3[256], arg4[256], arg5[256], arg6[256], arg7[256], arg8[256];
+	char *exec_args[9] = { arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
+	int argc = 0;
+	sleep(2);
+
+	/*
+	exec_args[0] == the target ELF's URI. loader.elf will load that ELF.
+	exec_args[1] to exec_args[8] == arguments to be passed to the target ELF.
+	*/
+	if (lapp != 0)
+	{
+		// if (lapp == 1)
+		// {
+			// strcpy(exec_args[0], "http://update.ps2.host/ELF/wLE.ELF");
+			// strcpy(exec_args[1], "mc0:/SYS-CONF/");
+			// strcpy(exec_args[2], "This");
+			// strcpy(exec_args[3], "Is");
+			// strcpy(exec_args[4], "a");
+			// strcpy(exec_args[5], "Test");
+			// argc = 6;
+		// }
+			if (lapp == 1)
+			{
+				strcpy(exec_args[0], "http://update.ps2.host/ELF/iLaunch.ELF");
+				argc = 1;
+			}
+	} else asm volatile("break\n"); // OUT OF BOUNDS, UNDEFINED ITEM!
+	
+	//Clear Screen To Make This Clusterfuck Look tidy!
+	scr_clear();
+	menu_header();
+	//
+	//Access Test (Make sure The Elf can Actually be Loaded N Shieet)
+	scr_printf("Access Test:\n");
+	ret = Access_Test(exec_args[0]);
+	if(ret < 0) {
+		scr_printf(" could not open the file\n");
+		printf("Returned from Access_Test(), could not open the file\n");
+		gotoOSDSYS(6);//Reboots Ps2 If this Shit Fails
+	} else {
+		scr_printf(" %d bytes\n", ret);
+		printf("Returned from Access_Test(), %d bytes\n", ret);
+	}
+	//
+	
+	// Display URL The ELF Is Being Loaded From
+	scr_printf("Launching Application from \n %s", arg0);
+	sleep(2);
+	/* Load the embedded wLaunchELF's loader.elf to its load address, by parsing its ELF header */
+	eh = (elf_header_t *)&loader_elf;
+	eph = (elf_pheader_t *)(&loader_elf + eh->phoff);
+
+	for(i = 0; i < eh->phnum; i++) {
+		dest = (u8*)(eph[i].vaddr);
+		pdata = (u8*)(&loader_elf + eph[i].offset);
+		for(j = 0; j < eph[i].filesz; j++) dest[j] = pdata[j];
+		if(eph[i].memsz > eph[i].filesz) {
+			dest = (u8 *)(eph[i].vaddr + eph[i].filesz);
+			for(j = 0; j < eph[i].memsz - eph[i].filesz; j++) dest[j] = '\0';
+		}
+	}
+	padPortClose(0, 0);
+	padEnd();
+	NetManDeinit();
+    SifExitRpc();
+    FlushCache(0);
+    FlushCache(2);
+
+	ExecPS2((void *)eh->entry, 0, argc, exec_args);
+}
+
+
 void endRasm(void)
 {
 	padPortClose(0, 0);
@@ -482,6 +593,20 @@ void endRasm(void)
 	loadGame();
 }
 
+int Access_Test(char *arg)
+{
+	int fd, size;
+
+	fd = open(arg, O_RDONLY);
+
+	if(fd >= 0) {
+		size = lseek(fd, 0, SEEK_END);
+		close(fd);
+	} else return fd;
+
+	return size;
+}
+
 int main(int argc, char *argv[]) 
 {
 
@@ -489,10 +614,10 @@ int main(int argc, char *argv[])
 	
 	// initialize
 	initialize();
-	// "Load IRX Modules"
-	LoadIRX();
+	scr_clear();
+	menu_header();
 	sleep(1);
-	//scr_printf("Modules Loaded Up. Starting up DHCP \n");
+	scr_printf("Modules Loaded Up. Starting up DHCP \n");
 	dhcpmain();
 	menu_Text();
 	//motd();
@@ -512,6 +637,10 @@ int main(int argc, char *argv[])
 			// menu_Text();
 		// }
 		
+		if (new_pad & PAD_SELECT)
+		{
+		 BootELF(1);
+		}
 		if(new_pad & PAD_CROSS)
 		{
 			int dlf,dlt,dlbk;

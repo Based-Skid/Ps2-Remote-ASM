@@ -2,7 +2,7 @@ EE_BIN = rasm.elf
 EE_BIN_PACKED = rasm-packed.elf
 ####
 # C File Objects
-EE_OBJS = main.o asm.o ps2ipc.o
+EE_OBJS = main.o loader_elf.o asm.o ps2ipc.o
 # SW Module Objects
 EE_OBJS += freesio2.o iomanX.o fileXio.o freepad.o mcman.o mcsrv.o
 # Network Module
@@ -30,7 +30,13 @@ all: $(EE_BIN)
 clean:
 	rm -f *.elf *.o *.s
 
+#wLaunchELF's loader.elf
 
+loader/loader.elf: loader
+	$(MAKE) -C $<
+
+loader_elf.s: loader/loader.elf
+	bin2s $< $@ loader_elf
 #poweroff Module
 
 poweroff.s:
