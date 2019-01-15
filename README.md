@@ -7,14 +7,14 @@ Copyright 2018-2019
 
 Licensed Under Academic Free License 3.0 (if applicable)
 
-
-
 A Remote Cheat Device For The PS2, Inject Compiled ASM Code,Cheats,Translation Patches,Etc. What Could go Wrong?
+
+## Features
 
 Injects Compiled ASM code from gtlcpimp's Code Designer into the ps2 from a remote server.
 
-## Features
-Can Reload a Later Version of itself From the internet (iLaunchELF core)
+Can Reload a Later Version of itself or another ELF From the internet (iLaunchELF core) (The Source Code and Demo ELF point to the iLaunch.ELF Loader Demo)
+
 ## Notes: 
 You Will need to use the Included Program in the Zip File to Compile your patch
 
