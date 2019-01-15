@@ -17,13 +17,13 @@ Injects Compiled ASM code from gtlcpimp's Code Designer into the ps2 from a remo
 Can Reload a Later Version of itself From the internet (iLaunchELF core)
 ## Notes: 
 You Will need to use the Included Program in the Zip File to Compile your patch
-----------------------------------------------------------------------
-Creating an update file 
-----------------------------------------------------------------------
 
+###Creating an update file 
 
 Run the "Patch Compiler.exe" and paste the compiled code from "Your Project".
+
 Click "SAVE" button. A file called "update.dat" will be created in the same folder as the Patch Compiler program.
+
 Do not use the Encryption function, This Project has not been Updated to Support Encrypted update.dat
 
 ----------------
