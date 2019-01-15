@@ -15,6 +15,10 @@ Injects Compiled ASM code from gtlcpimp's Code Designer into the ps2 from a remo
 
 Can Reload a Later Version of itself or another ELF From the internet (iLaunchELF core) (The Source Code and Demo ELF point to the iLaunch.ELF Loader Demo)
 
+Working DNS Resolution
+
+MD5 Library (To be Used later)
+
 ## Notes: 
 You Will need to use the Included Program in the Zip File to Compile your patch
 
