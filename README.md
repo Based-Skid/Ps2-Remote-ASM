@@ -51,7 +51,7 @@ This Program Was Built with The PS2DEV sdk and has utilized sample code from it 
 
 This Program Utilizes the HTTP Client File System from the PS2DEV sdk
 
-You Need to Build The ps2 SDK from source, older prebuilt versions will not work. SP193 Fixed a Problem with the HTTP Client File system that involved an RPC iirc. Nevertheless you will need the Latest SDK to Build this.
+This Program Requires the Latest PS2SDK to Build
 
 Some of the Controller Code is From "Cora Source".
 
