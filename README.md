@@ -20,7 +20,10 @@ Working DNS Resolution
 MD5 Library (To be Used later)
 
 ## Notes: 
-You Will need to use the Included Program in the Zip File to Compile your patch
+
+ASM.C is for including an "offline version" of your patch. (you dont have to remotely inject your patch if you dont want to.
+
+You Will need to use the Included Program in the Zip File to Compile your patch.
 
 ###Creating an update file 
 
