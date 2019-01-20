@@ -1,4 +1,4 @@
-# PS2-Remote-ASM
+# PS2-Remote-ASM [![Build Status](https://travis-ci.org/Based-Skid/Ps2-Remote-ASM.svg?branch=master)](https://travis-ci.org/Based-Skid/Ps2-Remote-ASM)
 Created By: Based_Skid, 1UP, Harry62, The_Dominator, krHACKen
 
 Special Thanks to: PS2DEV,SP193,Gtlcpimp32,Parasyte
