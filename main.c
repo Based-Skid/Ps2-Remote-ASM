@@ -521,39 +521,6 @@ int DLfile(char *url, FILE *dlfileName)
 
 }
 
-int downloadPatchfile(char *url)
-{
-     int fd, size, result;
-     void *buffer;
-	
-	fd = open(url, O_RDONLY);	
-     
-     if (fd >= 0)
-     {
-           size = lseek(fd, 0, SEEK_END);    //Get size of file
-           lseek(fd, 0, SEEK_SET);
-
-           if((buffer = malloc(size)) != NULL)
-           {
-               result = read(fd, buffer, size) == size ? 0 : -EIO; //Check that the whole file was read.
-
-               if(result != 0)
-                 free(buffer);
-           } else
-               result = -ENOMEM;
-
-           close(fd);
-           
-           // apply update to memory
-           apply_Update(buffer);
-           return 0;
-           
-     } else
-        result = fd;
-        return -1;
-
-}
-
 int apply_Update(unsigned int *buffer[])
 {
     DI();
@@ -603,6 +570,53 @@ int apply_Update(unsigned int *buffer[])
     EI();
 }
 
+int downloadPatchfile(char *url)
+{
+     int fd, size, result;
+     void *buffer;
+	
+	fd = open(url, O_RDONLY);	
+     
+     if (fd >= 0)
+     {
+           size = lseek(fd, 0, SEEK_END);    //Get size of file
+           lseek(fd, 0, SEEK_SET);
+
+           if((buffer = malloc(size)) != NULL)
+           {
+               result = read(fd, buffer, size) == size ? 0 : -EIO; //Check that the whole file was read.
+
+               if(result != 0)
+                 free(buffer);
+           } else
+               result = -ENOMEM;
+
+           close(fd);
+           
+           // apply update to memory
+           apply_Update(buffer);
+           return 0;
+           
+     } else
+        result = fd;
+        return -1;
+
+}
+
+
+int Access_Test(char *arg)
+{
+	int fd, size;
+
+	fd = open(arg, O_RDONLY);
+
+	if(fd >= 0) {
+		size = lseek(fd, 0, SEEK_END);
+		close(fd);
+	} else return fd;
+
+	return size;
+}
 
 void BootELF(int lapp)
 {
@@ -696,19 +710,7 @@ void endRasm(void)
 	loadGame();
 }
 
-int Access_Test(char *arg)
-{
-	int fd, size;
 
-	fd = open(arg, O_RDONLY);
-
-	if(fd >= 0) {
-		size = lseek(fd, 0, SEEK_END);
-		close(fd);
-	} else return fd;
-
-	return size;
-}
 
 int main(int argc, char *argv[]) 
 {
