@@ -4,7 +4,7 @@ IRX_DIR = irx/compiled
 
 ####
 # C File Objects
-EE_OBJS = main.o asm.o loader_elf.o ps2ipc.o
+EE_OBJS = main.o asm.o ps2ipc.o loader_elf.o 
 # SW Module Objects
 EE_OBJS += freesio2.o iomanX.o fileXio.o freepad.o mcman.o mcsrv.o USBD.o USBHDFSD.o
 # Network Module
