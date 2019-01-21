@@ -15,7 +15,7 @@ EE_OBJS += ps2dev9.o ps2ip-nm.o ps2ips.o netman.o smap.o ps2http.o
 # Other IRX
 EE_OBJS += poweroff.o
 # SBV Shit
-EE_INCS = -I$(PS2SDK)/ports/include -I$(PS2SDK)/sbv/include -I$(PS2SDK)/common/include
+EE_INCS = -I$(PS2SDK)/sbv/include -I$(PS2SDK)/common/include
 EE_LDFLAGS = -L$(PS2SDK)/sbv/lib 
 ####
 EE_LIBS = -lpadx -ldebug -lmc -lc -lpatches -ldebug -lkernel -lpoweroff -lnetman -lps2ips -lfileXio
