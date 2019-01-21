@@ -1,19 +1,24 @@
 EE_BIN = rasm.elf
 EE_BIN_PACKED = rasm-packed.elf
+IRX_DIR = irx/compiled
+
 ####
 # C File Objects
-EE_OBJS = main.o loader_elf.o asm.o ps2ipc.o
+EE_OBJS = main.o asm.o loader_elf.o ps2ipc.o
 # SW Module Objects
-EE_OBJS += freesio2.o iomanX.o fileXio.o freepad.o mcman.o mcsrv.o
+EE_OBJS += freesio2.o iomanX.o fileXio.o freepad.o mcman.o mcsrv.o USBD.o USBHDFSD.o
 # Network Module
 EE_OBJS += ps2dev9.o ps2ip-nm.o ps2ips.o netman.o smap.o ps2http.o
+
+
+
 # Other IRX
 EE_OBJS += poweroff.o
 # SBV Shit
-EE_INCS = -I$(PS2SDK)/ports/include -I$(PS2SDK)/sbv/include
+EE_INCS = -I$(PS2SDK)/ports/include -I$(PS2SDK)/sbv/include -I$(PS2SDK)/common/include
 EE_LDFLAGS = -L$(PS2SDK)/sbv/lib 
 ####
-EE_LIBS = -lpadx -lmtap -ldebug -lmc -lc -lpatches -ldebug -lkernel -lpoweroff -lnetman -lps2ips
+EE_LIBS = -lpadx -ldebug -lmc -lc -lpatches -ldebug -lkernel -lpoweroff -lnetman -lps2ips -lfileXio
 
 
 all: $(EE_BIN)
@@ -61,6 +66,12 @@ mcman.s:
 
 mcsrv.s:
 	bin2s $(PS2SDK)/iop/irx/mcserv.irx mcsrv.s mcserv
+	
+USBD.s: $(PS2SDK)/iop/irx/usbd.irx
+	bin2s $(PS2SDK)/iop/irx/usbd.irx USBD.s USBD
+
+USBHDFSD.s: $(PS2SDK)/iop/irx/usbhdfsd.irx
+	bin2s $(PS2SDK)/iop/irx/usbhdfsd.irx USBHDFSD.s USBHDFSD
 	
 ps2dev9.s:
 	bin2s $(PS2SDK)/iop/irx/ps2dev9.irx ps2dev9.s ps2dev9

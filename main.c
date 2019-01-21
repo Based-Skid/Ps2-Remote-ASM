@@ -1,4 +1,4 @@
-// All Includes are in Main.h, additional C Files should include main.h
+// All Includes are in Main.h,
 #include "main.h" 
 // App Strings
 #include "strings.h"
@@ -96,118 +96,123 @@ void initialize(void)
 void LoadModules(void)
 {
 	int ret;
-	
-	
-	ret = SifExecModuleBuffer(&freesio2, size_freesio2, 0, NULL, NULL);
-	if (ret < 0) 
-	{
-		printf("Failed to Load freesio2 sw module");
-		ret = SifLoadModule("rom0:XSIO2MAN", 0, NULL);
-		if (ret < 0) 
-		{
-			gotoOSDSYS(1);
-		}
-	}	
-	
 
 	ret = SifExecModuleBuffer(&iomanX, size_iomanX, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf("Failed to Load iomanx sw module");
-
+		printf("Failed to Load iomanx Module");
+		gotoOSDSYS(7);
 	}
 	
 	ret = SifExecModuleBuffer(&fileXio, size_fileXio, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf("Failed to Load freesio2 sw module");
+		printf("failed to Load fileXio Module");
+		gotoOSDSYS(8);
+	}	
+	// Init fileXio 
+	fileXioInit();
+	
+	ret = SifExecModuleBuffer(&freesio2, size_freesio2, 0, NULL, NULL);
+	if (ret < 0) 
+	{
+		printf("Failed to Load freesio2 Module");
+		gotoOSDSYS(1);
+		
+	}	
+	
 
-	}
-	
-	
 	ret = SifExecModuleBuffer(&freepad, size_freepad, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf("Failed to Load freepad sw module");
-		ret = SifLoadModule("rom0:XPADMAN", 0, NULL);
-		if (ret < 0) 
-		{
-			gotoOSDSYS(3);
-		}
+		printf("Failed to Load freepad Module");
+		gotoOSDSYS(3);
 	}
 	
 	ret = SifExecModuleBuffer(&mcman, size_mcman, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf("Failed to Load mcman sw module");
-		ret = SifLoadModule("rom0:XMCMAN", 0, NULL);
-		if (ret < 0) 
-		{
-			gotoOSDSYS(4);
-		}
+		printf("Failed to Load mcman Module");
+		gotoOSDSYS(4);
 	}
 	
 	ret = SifExecModuleBuffer(&mcserv, size_mcserv, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf("Failed to Load mcserv sw module");
-		ret = SifLoadModule("rom0:XMCSERV", 0, NULL);
-		if (ret < 0) 
-		{
-			gotoOSDSYS(5);
-		}
+		printf("Failed to Load mcserv Module");
+		gotoOSDSYS(5);
 	}
 	
+	
+	ret = SifExecModuleBuffer(&USBD, size_USBD, 0, NULL, NULL);
+	if (ret < 0) 
+	{
+		printf("Failed to Load USBD Module %d\n", ret);
+		gotoOSDSYS(9);
+	}
+	
+	ret = SifExecModuleBuffer(&USBHDFSD, size_USBHDFSD, 0, NULL, NULL);
+	if (ret < 0) 
+	{
+		printf("Failed to Load USBHDFSD module");
+		gotoOSDSYS(10);
+	}
+	
+		
 	ret = SifExecModuleBuffer(&ps2dev9, size_ps2dev9, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf(" Could not load ps2dev9.IRX! %d\n", ret);
-		SleepThread();
+		printf("Failed to Load DEV9 Module %d\n", ret);
+		gotoOSDSYS(11);
 	}
 	
 
 	ret = SifExecModuleBuffer(&netman, size_netman, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf(" Could not load netman.IRX! %d\n", ret);
-		SleepThread();
+		printf("Failed to Load netman module %d\n", ret);
+		gotoOSDSYS(12);
 	}
 
 	ret = SifExecModuleBuffer(&smap, size_smap, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf(" Could not load smap.IRX! %d\n", ret);
-		SleepThread();
+		printf("Failed to Load smap Module %d\n", ret);
+		gotoOSDSYS(13);
 	}
 	
 	ret = SifExecModuleBuffer(&ps2ipnm, size_ps2ipnm, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf(" Could not load ps2ip.IRX! %d\n", ret);
-		SleepThread();
+		printf("Failed to Load ps2ip-nm Module %d\n", ret);
+		gotoOSDSYS(14);
 	}
 	
 	ret = SifExecModuleBuffer(&ps2ips, size_ps2ips, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf(" Could not load ps2ips.IRX! %d\n", ret);
-		SleepThread();
+		printf("Failed to Load ps2ips Module! %d\n", ret);
+		gotoOSDSYS(15);
 	}
 	ps2ip_init();
 	
 	ret = SifExecModuleBuffer(&ps2http, size_ps2http, 0, NULL, NULL);
 	if (ret < 0)
 	{
-        scr_printf("	Could not load ps2http.IRX! %d\n", ret);
-	return -1;
+        scr_printf("Failed to Load ps2http.IRX! %d\n", ret);
+		gotoOSDSYS(16);
 	}
 	
 	ret = SifExecModuleBuffer(&poweroff, size_poweroff, 0, NULL, NULL);
 	if (ret < 0) 
 	{
-		printf("Failed to Load Poweroff IRX module");
-
+		printf("Failed to Load Poweroff module");
+		//gotoOSDSYS(17);
 	}
+	
+
+	//init MC\n
+	mcInit(MC_TYPE_XMC);
  
 	}
 	
@@ -363,13 +368,15 @@ void ResetIOP()
 	// SBV Patches Are Not part of a Normal IOP Reset.
 	sbv_patch_enable_lmb(); //SBV Patches
 	sbv_patch_disable_prefix_check(); //SBV Patch Load Executable IRX And ELF Files From User-Writable Storage
-	sbv_patch_user_mem_clear(0x00100000); // You Can Specify a Starting Address for the Wipe
+	//sbv_patch_user_mem_clear(0x00100000); // You Can Specify a Starting Address for the Wipe
 	//sbv_patch_user_mem_clear(0x02000000); // Disable Clear Memory With LoadExecPS2() when 0x02000000 is passed as an arg
 }
 
 
 void gotoOSDSYS(int sc)
 {
+	// The Purpose of this Function is to Provide a Soft Reset and Handle Module Loading Errors. 
+	//This Helps With Diagnosing Modules Failing to load
 	if (sc != 0)
 	{
 		scr_printf(appFail);
@@ -387,7 +394,7 @@ void gotoOSDSYS(int sc)
 		}
 		if (sc == 3)
 		{
-			scr_printf("PADMAN\n");
+			scr_printf("freepad\n");
 		}
 		if (sc == 4)
 		{
@@ -397,14 +404,73 @@ void gotoOSDSYS(int sc)
 		{
 			scr_printf("MCSERV\n");
 		}
-		if (sc == 6)
+		if (sc == 7)
+		{
+			scr_printf("iomanX\n");
+		}
+		if (sc == 8)
+		{
+			scr_printf("fileXio\n");
+		}
+		if (sc == 9)
+		{
+			scr_printf("USBD\n");
+		}
+		if (sc == 10)
+		{
+			scr_printf("USBHDFSD\n");
+		}
+		if (sc == 11)
+		{
+			scr_printf("DEV9\n");
+		}
+		if (sc == 12)
+		{
+			scr_printf("NETMAN\n");
+		}
+		if (sc == 13)
+		{
+			scr_printf("SMAP\n");
+		}
+		if (sc == 14)
+		{
+			scr_printf("PS2IP-NM\n");
+		}
+		if (sc == 15)
+		{
+			scr_printf("PS2IPS\n");
+		}
+		if (sc == 16)
+		{
+			scr_printf("ps2http HTTP Client File System\n");
+		}
+		if (sc == 17)
+		{
+			scr_printf("Poweroff\n");
+		}
+		if (sc == 141)
 		{
 			scr_printf("Failed to Load Remote ELF.\n");
 		}
+		if (sc == 999)
+		{
+			scr_printf("Unknown Error");
+		}
 		sleep(5);
 	}
+	//Terminate Pad
+	padPortClose(0, 0);
+	padEnd();
+	//Terminate Network
+	//NetManDeinit();
 	ResetIOP();
+	//Terminate fileXio
+	//fileXioExit();
+	//Prints OSD message
 	scr_printf(osdmsg);
+	//Terminate SIF Services
+	//SifExitRpc();
+	//Loads OSDSYS (We do this instead of Exiting to browser to Give the Feel of a Console Boot up,)
 	LoadExecPS2("rom0:OSDSYS", 0, NULL);
 }
 
@@ -419,8 +485,43 @@ void loadGame()
 	LoadExecPS2("cdrom0:\\SCUS_XXX.XX;1", 3, largs);
 }
 
+int DLfile(char *url, FILE *dlfileName)
+{
+     int fd, size, result;
+     void *buffer;
+	fd = open(url, O_RDONLY);	
+     
+     if (fd >= 0)
+     {
+           size = lseek(fd, 0, SEEK_END);    //Get size of file
+           lseek(fd, 0, SEEK_SET);
 
-int downloadfile(char *url)
+           if((buffer = malloc(size)) != NULL)
+           {
+               result = read(fd, buffer, size) == size ? 0 : -EIO; //Check that the whole file was read.
+
+               if(result != 0)
+                 free(buffer);
+           } else
+               result = -ENOMEM;
+
+           close(fd);
+           
+			fd = fioOpen(dlfileName,O_WRONLY | O_CREAT);
+			if(fd < 0) return -6;
+
+			fioWrite(fd,buffer,size);
+			fioClose(fd);
+			printf("FUCK! written sucessfully.\n");
+           return 0;
+           
+     } else
+        result = fd;
+        return -1;
+
+}
+
+int downloadPatchfile(char *url)
 {
      int fd, size, result;
      void *buffer;
@@ -502,6 +603,7 @@ int apply_Update(unsigned int *buffer[])
     EI();
 }
 
+
 void BootELF(int lapp)
 {
 	u8 *pdata, *dest;
@@ -531,9 +633,10 @@ void BootELF(int lapp)
 		// }
 			if (lapp == 1)
 			{
-				strcpy(exec_args[0], "http://update.ps2.host/ELF/iLaunch.ELF");
+				strcpy(exec_args[0], "http://update.ps2.host/ELF/mDU.ELF");
 				argc = 1;
 			}
+			
 	} else asm volatile("break\n"); // OUT OF BOUNDS, UNDEFINED ITEM!
 	
 	//Clear Screen To Make This Clusterfuck Look tidy!
@@ -546,7 +649,7 @@ void BootELF(int lapp)
 	if(ret < 0) {
 		scr_printf(" could not open the file\n");
 		printf("Returned from Access_Test(), could not open the file\n");
-		gotoOSDSYS(6);//Reboots Ps2 If this Shit Fails
+		gotoOSDSYS(141);//Reboots Ps2 If this Shit Fails
 	} else {
 		scr_printf(" %d bytes\n", ret);
 		printf("Returned from Access_Test(), %d bytes\n", ret);
@@ -645,7 +748,7 @@ int main(int argc, char *argv[])
 		{
 			int dlf,dlt,dlbk;
 			scr_printf("Applying Patch From the Internet....");
-			dlf = downloadfile(mainDownload);
+			dlf = downloadPatchfile(mainDownload);
 			if (dlf < 0) 
 			{
 				

@@ -19,8 +19,19 @@
 #include <io_common.h>
 #include <syscallnr.h>
 
+#include <sbv_patches.h>
 
-//#include "strings.h"
+
+#include <malloc.h>
+#include <sifcmd.h>
+
+#include <timer.h>
+#include <usbhdfsd-common.h>
+#include <limits.h>
+
+#include <sys/stat.h>
+#include <sys/fcntl.h>
+
 
 // IP Shit.
 #include <netman.h>
@@ -39,7 +50,7 @@ void PasteASM();
 //ps2ip.c
 int dhcpmain();
 
-// Modules
+// Module Related TBH idk what the fuck these are called (Variable????)
 extern void freesio2;
 extern void iomanX;
 extern void fileXio;
@@ -47,13 +58,14 @@ extern void freepad;
 extern void poweroff;
 extern void mcman;
 extern void mcserv;
+extern void USBD;
+extern void USBHDFSD;
 extern void ps2dev9;
 extern void netman;
 extern void smap;
 extern void ps2ipnm;
 extern void ps2ips;
 extern void ps2http;
-
 
 extern u32 size_poweroff;
 extern u32 size_freesio2;
@@ -62,12 +74,13 @@ extern u32 size_fileXio;
 extern u32 size_freepad;
 extern u32 size_mcman;
 extern u32 size_mcserv;
+extern u32 size_USBD;
+extern u32 size_USBHDFSD;
 extern u32 size_ps2dev9;
 extern u32 size_netman;
 extern u32 size_smap;
 extern u32 size_ps2ipnm;
 extern u32 size_ps2ips;
-//extern u32 size_dnsirx;
 extern u32 size_ps2http;
 //PAD VARIABLES
 //check for multiple definitions
