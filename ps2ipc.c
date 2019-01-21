@@ -188,8 +188,8 @@ static void ethPrintLinkStatus(void)
 	printf("Mode:\t");
 	mode = NetManIoctl(NETMAN_NETIF_IOCTL_ETH_GET_LINK_MODE, NULL, 0, NULL, 0);
 
-	//NETMAN_NETIF_ETH_LINK_MODE_PAUSE is a flag, so file it off first.
-	switch((mode & ~NETMAN_NETIF_ETH_LINK_MODE_PAUSE))
+	//NETMAN_NETIF_ETH_LINK_DISABLE_PAUSE is a flag, so file it off first.
+	switch((mode & ~NETMAN_NETIF_ETH_LINK_DISABLE_PAUSE))
 	{
 		case NETMAN_NETIF_ETH_LINK_MODE_10M_HDX:
 			printf("10M HDX");
@@ -206,7 +206,7 @@ static void ethPrintLinkStatus(void)
 		default:
 			printf("Unknown");
 	}
-	if(mode & NETMAN_NETIF_ETH_LINK_MODE_PAUSE)
+	if(mode & NETMAN_NETIF_ETH_LINK_DISABLE_PAUSE)
 		printf(" with ");
 	else
 		printf(" without ");
@@ -265,8 +265,8 @@ int dhcpmain(int argc, char *argv[])
 		printf("DHCP failed\n.");
 		goto end;
 	}
-	IP4_ADDR(&DNS, 8, 8, 8, 8);
-	dns_setserver(0, &DNS);
+//	IP4_ADDR(&DNS, 8, 8, 8, 8);
+//	dns_setserver(0, &DNS);
 	printf("done!\n");
 
 	printf("Initialized:\n");
@@ -279,9 +279,9 @@ int dhcpmain(int argc, char *argv[])
 
 end:
 	//To cleanup, just call these functions.
-	 printf("Failed to Obtain IP Address");
+//	 printf("Failed to Obtain IP Address");
 	//ps2ipDeinit();
-	NetManDeinit();
+//	NetManDeinit();
 
 
 	return 0;
