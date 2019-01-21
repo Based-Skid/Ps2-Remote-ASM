@@ -56,41 +56,124 @@ void menu_Text(void)
 	scr_printf(" \n");
 }
 
-void initialize(void)
+void ResetIOP()
 {
-
-	int ret;
-
-	SifInitRpc(0);
-	scr_clear();
-	// init debug screen
-	init_scr();
-	scr_clear();
-	menu_header();
-	scr_printf("Loading... Please Wait. \n");
-	// load all modules
-	LoadModules();
+	// Thanks To SP193 For Clarifying This
+	SifInitRpc(0);           //Initialize SIFRPC and SIFCMD. Although seemingly unimportant, this will update the addresses on the EE, which can prevent a crash from happening around the IOP reboot.
+	SifIopReset("", 0);      //Reboot IOP with default modules (empty command line)
+	while(!SifIopSync()){}   //Wait for IOP to finish rebooting.
+	SifInitRpc(0);           //Initialize SIFRPC and SIFCMD.
+	SifLoadFileInit();       //Initialize LOADFILE RPC.
+	fioInit();               //Initialize FILEIO RPC.
 	
-
-	// init pad
-	padInit(0);
-	if ((ret = padPortOpen(0, 0, padBuf)) == 0)
-	{
-		#if defined DEBUG
-			scr_printf("padOpenPort failed: %d\n", ret);
-		#endif
-		SleepThread();
-	}
-
-	if (!initializePad(0, 0))
-	{
-		#if defined DEBUG
-			scr_printf("pad initalization failed!\n");
-		#endif
-		SleepThread();
-
-	}
+	// SBV Patches Are Not part of a Normal IOP Reset.
+	sbv_patch_enable_lmb(); //SBV Patches
+	sbv_patch_disable_prefix_check(); //SBV Patch Load Executable IRX And ELF Files From User-Writable Storage
+	//sbv_patch_user_mem_clear(0x00100000); // You Can Specify a Starting Address for the Wipe
+	//sbv_patch_user_mem_clear(0x02000000); // Disable Clear Memory With LoadExecPS2() when 0x02000000 is passed as an arg
 }
+
+void gotoOSDSYS(int sc)
+{
+	// The Purpose of this Function is to Provide a Soft Reset and Handle Module Loading Errors. 
+	//This Helps With Diagnosing Modules Failing to load
+	if (sc != 0)
+	{
+		scr_printf(appFail);
+		if(sc ==1 || sc ==2 || sc ==3 || sc ==4 || sc ==5)
+		{
+			scr_printf(modloadfail);
+		}
+		if (sc == 1)
+		{
+			scr_printf("SIO2MAN\n");
+		}
+		if (sc == 2)
+		{
+			scr_printf("CDVDMAN\n");
+		}
+		if (sc == 3)
+		{
+			scr_printf("freepad\n");
+		}
+		if (sc == 4)
+		{
+			scr_printf("MCMAN\n");
+		}
+		if (sc == 5)
+		{
+			scr_printf("MCSERV\n");
+		}
+		if (sc == 7)
+		{
+			scr_printf("iomanX\n");
+		}
+		if (sc == 8)
+		{
+			scr_printf("fileXio\n");
+		}
+		if (sc == 9)
+		{
+			scr_printf("USBD\n");
+		}
+		if (sc == 10)
+		{
+			scr_printf("USBHDFSD\n");
+		}
+		if (sc == 11)
+		{
+			scr_printf("DEV9\n");
+		}
+		if (sc == 12)
+		{
+			scr_printf("NETMAN\n");
+		}
+		if (sc == 13)
+		{
+			scr_printf("SMAP\n");
+		}
+		if (sc == 14)
+		{
+			scr_printf("PS2IP-NM\n");
+		}
+		if (sc == 15)
+		{
+			scr_printf("PS2IPS\n");
+		}
+		if (sc == 16)
+		{
+			scr_printf("ps2http HTTP Client File System\n");
+		}
+		if (sc == 17)
+		{
+			scr_printf("Poweroff\n");
+		}
+		if (sc == 141)
+		{
+			scr_printf("Failed to Load Remote ELF.\n");
+		}
+		if (sc == 999)
+		{
+			scr_printf("Unknown Error");
+		}
+		sleep(5);
+	}
+	//Terminate Pad
+	padPortClose(0, 0);
+	padEnd();
+	//Terminate Network
+	//NetManDeinit();
+	ResetIOP();
+	//Terminate fileXio
+	//fileXioExit();
+	//Prints OSD message
+	scr_printf(osdmsg);
+	//Terminate SIF Services
+	//SifExitRpc();
+	//Loads OSDSYS (We do this instead of Exiting to browser to Give the Feel of a Console Boot up,)
+	LoadExecPS2("rom0:OSDSYS", 0, NULL);
+}
+
 
 
 void LoadModules(void)
@@ -355,126 +438,6 @@ void pad_wait_button(u32 button)
 	}
 }
 
-void ResetIOP()
-{
-	// Thanks To SP193 For Clarifying This
-	SifInitRpc(0);           //Initialize SIFRPC and SIFCMD. Although seemingly unimportant, this will update the addresses on the EE, which can prevent a crash from happening around the IOP reboot.
-	SifIopReset("", 0);      //Reboot IOP with default modules (empty command line)
-	while(!SifIopSync()){}   //Wait for IOP to finish rebooting.
-	SifInitRpc(0);           //Initialize SIFRPC and SIFCMD.
-	SifLoadFileInit();       //Initialize LOADFILE RPC.
-	fioInit();               //Initialize FILEIO RPC.
-	
-	// SBV Patches Are Not part of a Normal IOP Reset.
-	sbv_patch_enable_lmb(); //SBV Patches
-	sbv_patch_disable_prefix_check(); //SBV Patch Load Executable IRX And ELF Files From User-Writable Storage
-	//sbv_patch_user_mem_clear(0x00100000); // You Can Specify a Starting Address for the Wipe
-	//sbv_patch_user_mem_clear(0x02000000); // Disable Clear Memory With LoadExecPS2() when 0x02000000 is passed as an arg
-}
-
-
-void gotoOSDSYS(int sc)
-{
-	// The Purpose of this Function is to Provide a Soft Reset and Handle Module Loading Errors. 
-	//This Helps With Diagnosing Modules Failing to load
-	if (sc != 0)
-	{
-		scr_printf(appFail);
-		if(sc ==1 || sc ==2 || sc ==3 || sc ==4 || sc ==5)
-		{
-			scr_printf(modloadfail);
-		}
-		if (sc == 1)
-		{
-			scr_printf("SIO2MAN\n");
-		}
-		if (sc == 2)
-		{
-			scr_printf("CDVDMAN\n");
-		}
-		if (sc == 3)
-		{
-			scr_printf("freepad\n");
-		}
-		if (sc == 4)
-		{
-			scr_printf("MCMAN\n");
-		}
-		if (sc == 5)
-		{
-			scr_printf("MCSERV\n");
-		}
-		if (sc == 7)
-		{
-			scr_printf("iomanX\n");
-		}
-		if (sc == 8)
-		{
-			scr_printf("fileXio\n");
-		}
-		if (sc == 9)
-		{
-			scr_printf("USBD\n");
-		}
-		if (sc == 10)
-		{
-			scr_printf("USBHDFSD\n");
-		}
-		if (sc == 11)
-		{
-			scr_printf("DEV9\n");
-		}
-		if (sc == 12)
-		{
-			scr_printf("NETMAN\n");
-		}
-		if (sc == 13)
-		{
-			scr_printf("SMAP\n");
-		}
-		if (sc == 14)
-		{
-			scr_printf("PS2IP-NM\n");
-		}
-		if (sc == 15)
-		{
-			scr_printf("PS2IPS\n");
-		}
-		if (sc == 16)
-		{
-			scr_printf("ps2http HTTP Client File System\n");
-		}
-		if (sc == 17)
-		{
-			scr_printf("Poweroff\n");
-		}
-		if (sc == 141)
-		{
-			scr_printf("Failed to Load Remote ELF.\n");
-		}
-		if (sc == 999)
-		{
-			scr_printf("Unknown Error");
-		}
-		sleep(5);
-	}
-	//Terminate Pad
-	padPortClose(0, 0);
-	padEnd();
-	//Terminate Network
-	//NetManDeinit();
-	ResetIOP();
-	//Terminate fileXio
-	//fileXioExit();
-	//Prints OSD message
-	scr_printf(osdmsg);
-	//Terminate SIF Services
-	//SifExitRpc();
-	//Loads OSDSYS (We do this instead of Exiting to browser to Give the Feel of a Console Boot up,)
-	LoadExecPS2("rom0:OSDSYS", 0, NULL);
-}
-
-
 
 void loadGame()
 {
@@ -710,7 +673,41 @@ void endRasm(void)
 	loadGame();
 }
 
+void initialize(void)
+{
 
+	int ret;
+
+	SifInitRpc(0);
+	scr_clear();
+	// init debug screen
+	init_scr();
+	scr_clear();
+	menu_header();
+	scr_printf("Loading... Please Wait. \n");
+	// load all modules
+	LoadModules();
+	
+
+	// init pad
+	padInit(0);
+	if ((ret = padPortOpen(0, 0, padBuf)) == 0)
+	{
+		#if defined DEBUG
+			scr_printf("padOpenPort failed: %d\n", ret);
+		#endif
+		SleepThread();
+	}
+
+	if (!initializePad(0, 0))
+	{
+		#if defined DEBUG
+			scr_printf("pad initalization failed!\n");
+		#endif
+		SleepThread();
+
+	}
+}
 
 int main(int argc, char *argv[]) 
 {
