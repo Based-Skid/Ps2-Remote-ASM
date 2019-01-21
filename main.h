@@ -18,9 +18,9 @@
 #include <iopheap.h>
 #include <io_common.h>
 #include <syscallnr.h>
-
+#include <unistd.h>
 #include <sbv_patches.h>
-
+#include <fileXio_rpc.h>
 
 #include <malloc.h>
 #include <sifcmd.h>
