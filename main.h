@@ -36,6 +36,7 @@
 // IP Shit.
 #include <netman.h>
 #include <ps2ip.h>
+#include <ps2ips.h>
 
 // SBV
 #include <sbv_patches.h>
