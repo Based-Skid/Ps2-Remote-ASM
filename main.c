@@ -439,7 +439,12 @@ void pad_wait_button(u32 button)
 }
 
 
-void loadGame()
+void loadGame() 
+/* Special Thanks To Dominator For Finding Launch Arguments in Socom 2 That Allow Direct boot to LAN 
+and Providing The original PS2LOGO Code to Pass the args the Main Executable,
+This Function Does not Call PS2LOGO and Calls LoadExecPS2 instead. 
+You Can Customize this to Suit Your game of choice and also pass launch args if you find any
+*/
 {
 	char *largs[3];
 	largs[1] = NULL;
@@ -449,6 +454,7 @@ void loadGame()
 }
 
 int DLfile(char *url, FILE *dlfileName)
+
 {
      int fd, size, result;
      void *buffer;
@@ -532,7 +538,9 @@ int apply_Update(unsigned int *buffer[])
     ee_kmode_exit(); // Exit Kernel Mode
     EI(); // Resume Interupt Handlers
 }
-
+/*
+Thanks to 1up For Simplfying the Download Function.
+*/
 int downloadPatchfile(char *url)
 {
      int fd, size, result;
@@ -616,17 +624,17 @@ void BootELF(int lapp)
 			
 	} else asm volatile("break\n"); // OUT OF BOUNDS, UNDEFINED ITEM!
 	
-	//Clear Screen To Make This Clusterfuck Look tidy!
+	//Clear Screen To Make This Look tidy!
 	scr_clear();
 	menu_header();
 	//
-	//Access Test (Make sure The Elf can Actually be Loaded N Shieet)
+	//Access Test (Make sure The Elf can Actually be Loaded So we Dont Crash The PS2)
 	scr_printf("Access Test:\n");
 	ret = Access_Test(exec_args[0]);
 	if(ret < 0) {
 		scr_printf(" could not open the file\n");
 		printf("Returned from Access_Test(), could not open the file\n");
-		gotoOSDSYS(141);//Reboots Ps2 If this Shit Fails
+		gotoOSDSYS(141);//Reboots Ps2 If this Fails
 	} else {
 		scr_printf(" %d bytes\n", ret);
 		printf("Returned from Access_Test(), %d bytes\n", ret);
