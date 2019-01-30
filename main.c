@@ -75,7 +75,7 @@ This Specific Patch Allows you To Hijack and Control the Starting Address in Use
 You Can Also Completely Disable The User Memory Wipe as Well.
 	//sbv_patch_user_mem_clear(0x00100000); // You Can Specify a Starting Address for the Wipe
 	//sbv_patch_user_mem_clear(0x02000000); // Disable Clear Memory With LoadExecPS2() when 0x02000000 is passed as an arg
-/*
+*/
 }
 
 void gotoOSDSYS(int sc)
