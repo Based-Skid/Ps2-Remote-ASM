@@ -69,8 +69,13 @@ void ResetIOP()
 	// SBV Patches Are Not part of a Normal IOP Reset.
 	sbv_patch_enable_lmb(); //SBV Patches
 	sbv_patch_disable_prefix_check(); //SBV Patch Load Executable IRX And ELF Files From User-Writable Storage
+/*
+I should Note That These SBV patches are also known as protokernel patches.
+This Specific Patch Allows you To Hijack and Control the Starting Address in User Memory when memory wipe syscalls are triggered by Games and other software
+You Can Also Completely Disable The User Memory Wipe as Well.
 	//sbv_patch_user_mem_clear(0x00100000); // You Can Specify a Starting Address for the Wipe
 	//sbv_patch_user_mem_clear(0x02000000); // Disable Clear Memory With LoadExecPS2() when 0x02000000 is passed as an arg
+/*
 }
 
 void gotoOSDSYS(int sc)
