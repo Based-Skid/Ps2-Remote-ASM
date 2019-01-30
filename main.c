@@ -2,7 +2,7 @@
 #include "main.h" 
 // App Strings
 #include "strings.h"
-// MD5 Shit
+// MD5 Lib. (Not yet used, We are Still working on File hashing functions )
 #include "md5.h"
 
 extern void loader_elf; // wLaunchELF's loader.elf.
