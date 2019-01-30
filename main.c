@@ -486,8 +486,8 @@ int DLfile(char *url, FILE *dlfileName)
 
 int apply_Update(unsigned int *buffer[])
 {
-    DI();
-    ee_kmode_enter();
+    DI(); // Suspend Interupt Handlers
+    ee_kmode_enter(); // Exit Kernel Mode
 
     // address variable
     unsigned int *address = 0;    
@@ -529,8 +529,8 @@ int apply_Update(unsigned int *buffer[])
             break;
         }
     }    
-    ee_kmode_exit();
-    EI();
+    ee_kmode_exit(); // Exit Kernel Mode
+    EI(); // Resume Interupt Handlers
 }
 
 int downloadPatchfile(char *url)
