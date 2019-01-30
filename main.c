@@ -481,7 +481,7 @@ int DLfile(char *url, FILE *dlfileName)
 
 			fioWrite(fd,buffer,size);
 			fioClose(fd);
-			printf("FUCK! written sucessfully.\n");
+			printf("Your File was written sucessfully.\n");// Print Sucess to Debug/pcsx2 Console
            return 0;
            
      } else
@@ -491,6 +491,12 @@ int DLfile(char *url, FILE *dlfileName)
 }
 
 int apply_Update(unsigned int *buffer[])
+/*
+This Function Is what Applies Your Update.dat
+a friendly Reminder that update.dat encryption is not supported in the public source code for the RASM Core Application at this time
+
+
+*/
 {
     DI(); // Suspend Interupt Handlers
     ee_kmode_enter(); // Exit Kernel Mode
@@ -530,7 +536,7 @@ int apply_Update(unsigned int *buffer[])
         else
         {
             // something went wrong
-            scr_printf("\n\nUpdate failed, restart PS2.");
+            scr_printf("\n\nUpdate failed, Please restart The PS2 \n.");
             // force loop to stop
             break;
         }
@@ -576,6 +582,10 @@ int downloadPatchfile(char *url)
 
 
 int Access_Test(char *arg)
+/*
+This Function Makes Sure that The Remote ELF File is Accesable and Also Reports The Size of the file in bytes
+This could be useful to diagnose Issues with your webserver or the application
+*/
 {
 	int fd, size;
 
