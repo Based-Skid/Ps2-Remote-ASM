@@ -443,12 +443,46 @@ void pad_wait_button(u32 button)
 	}
 }
 
+/*
+The Function Below is The Code We used in the R0005 Version of RASM To Boot Socom 2 Directly Into LAN Mode to Save The User Time
+
+void bootSocom2_LAN()
+{
+	char *largs[2];
+	largs[0] = "--menu_state";
+	largs[1] = "dlgReturnFromNTGUI2LAN.rdr";
+	largs[2] = NULL;
+	LoadExecPS2("cdrom0:\\SCUS_972.75;1", 2, largs);
+}
+
+This Function Will Boot Socom Combined Assault Directly into LAN mode.
+
+The 0 in the 4th Argument Designates a Profile Slot,
+
+For Example inside of Socom CA you have a Default profile With the name Specter, That would be Profile 0
+
+void BootSocomCA_LAN()
+{
+    char *largs[4];
+    largs[1] = --mission;
+    largs[2] = ui_lan;
+    largs[3] = --profile;
+    largs[4] = 0
+    LoadExecPS2("cdrom0:\\SCUS_975.45;1", 4, largs);
+}
+
+*/
 
 void loadGame() 
 /* Special Thanks To Dominator For Finding Launch Arguments in Socom 2 That Allow Direct boot to LAN 
 and Providing The original PS2LOGO Code to Pass the args the Main Executable,
 This Function Does not Call PS2LOGO and Calls LoadExecPS2 instead. 
 You Can Customize this to Suit Your game of choice and also pass launch args if you find any
+
+Note SCUS,SLUS,SCES,etc are a prefix to designate Region and if it was An offical Sony game or if it was a licensed Dev.
+Some Games 
+To find the Main Executable of your Game you would want to look at the system.cnf file on the game disk or in its ISO file.
+
 */
 {
 	char *largs[3];
@@ -459,7 +493,11 @@ You Can Customize this to Suit Your game of choice and also pass launch args if 
 }
 
 int DLfile(char *url, FILE *dlfileName)
-
+/*
+Downloads a File and Writes it to storage
+Only Tested With the Memory Card at this Time!
+Example usage DLfile(http://path.to/your/fi.le, mc0://BOOT/MY.ELF);
+*/
 {
      int fd, size, result;
      void *buffer;
@@ -486,7 +524,7 @@ int DLfile(char *url, FILE *dlfileName)
 
 			fioWrite(fd,buffer,size);
 			fioClose(fd);
-			printf("Your File was written sucessfully.\n");// Print Sucess to Debug/pcsx2 Console
+			printf("Your File was written sucessfully.\n");// Print Confirmation to Debug/pcsx2 Console
            return 0;
            
      } else
